@@ -1,37 +1,34 @@
 <template>
     <div
         :key="url"
-        class="kiwi-mediaviewer-iframely"
+        class="kiwi-mediaviewer-embedly"
     >
-        <a
-            ref="iframelyLink"
-            :href="url"
-            :data-iframely-url="iframelyUrl"
-            class="kiwi-iframely-card"
-        >{{ $t('media_loading', {url: url}) }}</a>
+        <iframe
+            :src="iframeUrl"
+            frameborder="0"
+            scrolling="no"
+            width="100%"
+            height="auto"
+            style="border: none; overflow: hidden;"
+        ></iframe>
     </div>
 </template>
 
 <script>
 'kiwi public';
 
-let iframelyTagIncluded = false;
-
 export default {
     props: ['url', 'showPin', 'iframeSandboxOptions'],
     data() {
         return {
-            iframelyObject: null,
+            embedlyObject: null,
             waitTimer: 0,
             waitCount: 0,
         };
     },
     computed: {
-        iframelyApiKey() {
-            return this.$state.setting('buffers.iframelyApiKey');
-        },
-        iframelyUrl() {
-            return `https://cdn.iframe.ly/api/iframely?url=${encodeURIComponent(this.url)}&api_key=${this.iframelyApiKey}`;
+        settings() {
+            return this.$state.setting('embedly');
         },
     },
     watch: {
@@ -48,64 +45,46 @@ export default {
     },
     methods: {
         updateEmbed() {
-            let checkIframelyAndShowCard = () => {
-                if (typeof window.iframely !== 'function') {
-                    if (this.waitTimer) {
-                        clearTimeout(this.waitTimer);
-                        this.waitTimer = 0;
+            const apiKey = this.$state.setting('buffers.iframelyApiKey');
+            const apiUrl = `https://iframe.ly/api/iframely?url=${encodeURIComponent(this.url)}&api_key=${apiKey}`;
+
+            fetch(apiUrl)
+                .then((response) => response.json())
+                .then((data) => {
+                    const embedHtml = data.html;
+                    if (embedHtml) {
+                        this.$nextTick(() => {
+                            const embedContainer = document.createElement('div');
+                            embedContainer.classList.add('embed-container');
+                            embedContainer.innerHTML = embedHtml;
+                            this.$el.appendChild(embedContainer);
+                            this.$emit('setHeight', 'auto');
+                            if (this.showPin) {
+                                this.$el.style.maxHeight = (this.settings.maxHeight || 400) + 'px';
+                            } else {
+                                this.$emit('setMaxHeight', '54%');
+                            }
+                        });
+                    } else if (this.showPin) {
+                        this.$emit('close');
                     }
-                    if (this.waitCount < 300) {
-                        this.waitCount++;
-                        this.waitTimer = setTimeout(checkIframelyAndShowCard, 100);
-                    }
-                    return;
-                }
-
-                this.$nextTick(() => {
-                    this.iframelyObject = window.iframely('card', this.$refs.iframelyLink);
-                    if (!this.iframelyObject) {
-                        if (this.showPin) {
-                            this.$emit('close');
-                        }
-                        return;
-                    }
-
-                    this.iframelyObject.on('card.error', (iframe) => {
-                        if (this.showPin) {
-                            this.$emit('close');
-                        }
-                    });
-
-                    this.$emit('setHeight', 'auto');
-
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch embed:', error);
                     if (this.showPin) {
-                        this.$el.style.maxHeight = '400px';
-                    } else {
-                        this.$emit('setMaxHeight', '54%');
+                        this.$emit('close');
                     }
                 });
-            };
-
-            if (!iframelyTagIncluded) {
-                const head = document.getElementsByTagName('head')[0];
-                const script = document.createElement('script');
-                script.type = 'text/javascript';
-                const iframelyUrl = this.$state.getSetting('settings.iframely.script') ||
-                    '//cdn.iframe.ly/embed.js';
-                script.src = iframelyUrl;
-                head.appendChild(script);
-                iframelyTagIncluded = true;
-            }
-            checkIframelyAndShowCard();
         },
+
         cleanEmbed() {
             if (this.waitTimer) {
                 clearTimeout(this.waitTimer);
                 this.waitTimer = 0;
             }
-            if (this.iframelyObject) {
-                this.iframelyObject.remove();
-                this.iframelyObject = null;
+            if (this.embedlyObject) {
+                this.embedlyObject.remove();
+                this.embedlyObject = null;
             }
         },
     },
@@ -115,18 +94,41 @@ export default {
 
 <style>
 
-    .kiwi-iframely-card {
-        display: block;
-        margin: 4px 0;
-    }
+.embedly-card {
+    display: block;
+    margin: 4px 0;
+}
 
-    .kiwi-mediaviewer-iframely {
-        display: inline-block;
-        overflow: auto;
-    }
+.embedly-card-hug {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    background: #fff;
+}
 
-    .kiwi-main-mediaviewer .kiwi-mediaviewer-iframely {
-        display: block;
-    }
+.kiwi-mediaviewer-embedly {
+    display: inline-block;
+    overflow: auto;
+}
 
+.kiwi-main-mediaviewer .kiwi-mediaviewer-embedly {
+    display: block;
+}
+
+.embed-container {
+    position: relative;
+    padding-bottom: 56.25%; /* This ratio will fit 16:9 content */
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.embed-container iframe,
+.embed-container object,
+.embed-container embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
 </style>
