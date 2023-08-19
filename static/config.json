@@ -1,9 +1,31 @@
 {
-    "windowTitle": "Kiwi IRC - The web IRC client",
+    "windowTitle": "Ewnix Chat",
+    "restricted": true,
     "startupScreen": "welcome",
-    "kiwiServer": "https://localdev.clients.kiwiirc.com/webirc/kiwiirc/",
-    "restricted": false,
-    "theme": "Default",
+    "useMonospace": false,
+    "restricted": true,
+    "kiwiServer": "https://devel.ewnix.net/chat/webirc/kiwiirc",
+    "warnOnExit": true,
+    "showAutoComplete": true,
+    "showSendButton": true,
+    "sidebarDefault": "nicklist",
+    "showColorPicker": true,
+    "showEmojiPicker": true,
+    "showAwayStatusIndicators": true,
+    "autoReconnect": true,
+    "buffers": {
+	"messageLayout": "modern",
+	"alert_on": "highlight",
+	"show_joinparts": false,
+	"coloured_nicklist": true,
+	"colour_nicknames_in_messages": true,
+	"show_emoticons": true,
+	"flash_title": "highlight",
+	"nicklist_avatars": true,
+	"show_link_previews": false,
+	"inline_link_auto_previews": false
+    },
+    "theme": "Dark",
     "themes": [
         { "name": "Default", "url": "static/themes/default" },
         { "name": "Dark", "url": "static/themes/dark" },
@@ -16,13 +38,23 @@
         { "name": "Elite", "url": "static/themes/elite" }
     ],
     "startupOptions" : {
-        "channel": "#kiwiirc-default",
-        "nick": "kiwi-n?"
+	"server" : "irc.ewnix.net",
+	"port": 8097,
+	"tls": true,
+	"direct": true,
+        "channel": "#Ewnix,#Games,#FeatureRequests",
+	"toggablePassword": false,
+	"greetingText": "Ewnix Chat",
+        "nick": ""
     },
     "embedly": {
         "key": ""
     },
     "plugins": [
-        { "name": "customise", "url": "static/plugins/customise.html" }
+        { "name": "customise", "url": "static/plugins/customise.html" },
+	{ "name": "font-size", "url": "static/plugins/font-size.html" },
+	{ "name": "avatars", "url": "static/plugins/avatars.html" },
+	{ "name": "updateavatars", "url": "static/plugins/updateavatars.html" }
     ]
 }
+

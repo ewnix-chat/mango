@@ -1,0 +1,38 @@
+<script>
+kiwi.plugin('updateavatars', function(kiwi) {
+    // Function to check if an image exists at a given URL
+    function imageExists(url, callback) {
+        var img = new Image();
+        img.onload = function() { callback(true); };
+        img.onerror = function() { callback(false); };
+        img.src = url;
+    }
+
+    // Function to update avatars
+    function updateAvatars() {
+        var activeBuffer = kiwi.state.getActiveBuffer();
+        if (activeBuffer && activeBuffer.users) {
+            var usersArray = Object.values(activeBuffer.users);
+            usersArray.forEach(function(user) {
+                var username = user.nick;
+                var avatarURL = 'http://sjc1.vultrobjects.com/ewnix-avatars/' + username.toLowerCase() + '/avatar.png';
+                imageExists(avatarURL, function(exists) {
+                    if (exists) {
+                        kiwi.state.addUser(activeBuffer.networkid, {nick: username, avatar: {
+                            small: avatarURL
+                        }});
+                    }
+                });
+            });
+        }
+    }
+
+    // Command to trigger the updateAvatars function
+    kiwi.state.$on('input.command.updateavatars', function(event) {
+        updateAvatars();
+
+        // Prevent the command from being sent to the server
+        event.preventDefault();
+    });
+});
+</script>

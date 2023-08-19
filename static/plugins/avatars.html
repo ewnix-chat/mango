@@ -1,0 +1,49 @@
+<script>
+kiwi.plugin('custom-avatars', function(kiwi) {
+    // Function to check if an image exists at a given URL
+    function imageBurper(url, callback) {
+        const http = new XMLHttpRequest();
+        http.open('HEAD', url + '?' + Math.floor(Date.now() / 1000));
+        http.onreadystatechange = function() {
+            if (this.readyState == this.DONE) {
+                const nonce = Date.parse(http.getResponseHeader('last-modified'));
+                callback(this.status >= 200 && this.status < 400, nonce);
+            }
+        };
+        http.send();
+    }
+
+    // TODO: debounce on a per nick basis
+    function updateAvatar(nick, id) {
+        const avatarURL = 'https://sjc1.vultrobjects.com/ewnix-avatars/' + nick.toLowerCase() + '/avatar.png';
+        imageBurper(avatarURL, function(exists, nonce) {
+            if (exists) {
+                kiwi.state.addUser(id, {nick: nick, avatar: {
+                    small: avatarURL + "?" + nonce
+                }});
+            }
+        });
+    }
+
+    // Function to update avatars
+    function updateAvatars() {
+        const activeBuffer = kiwi.state.getActiveBuffer();
+        if (activeBuffer && activeBuffer.users) {
+            const usersArray = Object.values(activeBuffer.users);
+            usersArray.forEach(function(user) {
+                updateAvatar(user.nick, activeBuffer.networkid)
+            });
+        }
+    }
+
+    // Set a listener for IRC messages
+    kiwi.on('irc.message', function(event, network) {
+        updateAvatar(event.nick, network.id);
+    });
+
+    // Set a listener for the irc.registered event
+    kiwi.on('irc.registered', function() {
+        setTimeout(updateAvatars, 1000); // Call the updateAvatars function after a 1s delay
+    });
+});
+</script>
