@@ -13,6 +13,7 @@
     "showEmojiPicker": true,
     "showAwayStatusIndicators": true,
     "autoReconnect": true,
+    "iframelyApiKey": "",
     "buffers": {
 	"messageLayout": "modern",
 	"alert_on": "highlight",
@@ -23,8 +24,7 @@
 	"flash_title": "highlight",
 	"nicklist_avatars": true,
 	"show_link_previews": true,
-	"inline_link_auto_previews": true, 
-	"iframelyApiKey": ""
+	"inline_link_auto_previews": true 
     },
     "theme": "Dark",
     "themes": [
