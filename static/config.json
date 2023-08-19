@@ -22,8 +22,9 @@
 	"show_emoticons": true,
 	"flash_title": "highlight",
 	"nicklist_avatars": true,
-	"show_link_previews": false,
-	"inline_link_auto_previews": false
+	"show_link_previews": true,
+	"inline_link_auto_previews": true, 
+	"iframelyApiKey": ""
     },
     "theme": "Dark",
     "themes": [
