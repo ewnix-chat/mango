@@ -50,6 +50,7 @@
 
 import _ from 'lodash';
 import UrlEmbed from './UrlEmbed.vue';
+import config from '../../static/config.json';
 
 export default {
     components: {
@@ -59,6 +60,7 @@ export default {
     data() {
         return {
             debouncedUpdateEmbed: null,
+            iframelyApiKey: config.buffers.iframelyApiKey,
         };
     },
     computed: {
