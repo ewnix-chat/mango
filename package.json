@@ -16,6 +16,7 @@
   "dependencies": {
     "@babel/runtime-corejs3": "^7.22.6",
     "@panter/vue-i18next": "^0.15.2",
+    "axios": "^1.4.0",
     "buffer": "^6.0.3",
     "compare-versions": "^5.0.3",
     "css-vars-ponyfill": "^2.4.8",
